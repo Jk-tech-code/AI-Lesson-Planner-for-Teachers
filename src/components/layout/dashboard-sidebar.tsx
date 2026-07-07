@@ -17,10 +17,8 @@ import {
   MessageSquare,
   Settings,
   Building2,
-  ChevronLeft,
   Sparkles,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 
@@ -43,13 +41,17 @@ const bottomLinks = [
   { label: "Settings", href: "/settings", icon: Settings },
 ]
 
-export function DashboardSidebar() {
+interface SidebarContentProps {
+  onNavClick?: () => void
+}
+
+function SidebarContent({ onNavClick }: SidebarContentProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden lg:flex w-64 flex-col border-r bg-sidebar">
-      <div className="flex h-14 items-center gap-2 border-b px-6 font-bold">
-        <Sparkles className="h-5 w-5 text-blue-600" />
+    <>
+      <div className="flex h-14 items-center gap-2 border-b px-6 font-semibold">
+        <Sparkles className="h-5 w-5 text-primary" />
         <span className="text-sm">AI Lesson Planner</span>
       </div>
       <ScrollArea className="flex-1 py-2">
@@ -58,14 +60,15 @@ export function DashboardSidebar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                pathname === link.href
+                pathname === link.href || pathname.startsWith(link.href + "/")
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
-              <link.icon className="h-4 w-4" />
+              <link.icon className="h-4 w-4 shrink-0" />
               {link.label}
             </Link>
           ))}
@@ -76,19 +79,36 @@ export function DashboardSidebar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                pathname === link.href
+                pathname === link.href || pathname.startsWith(link.href + "/")
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
-              <link.icon className="h-4 w-4" />
+              <link.icon className="h-4 w-4 shrink-0" />
               {link.label}
             </Link>
           ))}
         </nav>
       </ScrollArea>
+    </>
+  )
+}
+
+export function DashboardSidebar() {
+  return (
+    <aside className="hidden lg:flex w-64 flex-col border-r bg-sidebar h-screen sticky top-0 shrink-0">
+      <SidebarContent />
+    </aside>
+  )
+}
+
+export function MobileSidebar({ onNavClick }: { onNavClick: () => void }) {
+  return (
+    <aside className="flex flex-col h-full bg-sidebar">
+      <SidebarContent onNavClick={onNavClick} />
     </aside>
   )
 }
