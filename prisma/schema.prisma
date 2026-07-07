@@ -1,0 +1,668 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  SUPER_ADMIN
+  SCHOOL_ADMIN
+  TEACHER
+}
+
+enum SubscriptionTier {
+  FREE
+  PROFESSIONAL
+  SCHOOL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  EXPIRED
+  TRIALING
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+  MPESA
+}
+
+enum DocumentType {
+  SCHEME_OF_WORK
+  LESSON_PLAN
+  LESSON_NOTE
+  WORKSHEET
+  HOMEWORK
+  ASSESSMENT
+  EXAM
+  MARKING_SCHEME
+}
+
+enum ExportFormat {
+  PDF
+  WORD
+  POWERPOINT
+  EXCEL
+  GOOGLE_DOCS
+}
+
+enum CurriculumType {
+  CBC
+  CAMBRIDGE
+  IB
+  IGCSE
+  AMERICAN
+}
+
+enum GradeLevel {
+  PP1
+  PP2
+  GRADE_1
+  GRADE_2
+  GRADE_3
+  GRADE_4
+  GRADE_5
+  GRADE_6
+  GRADE_7
+  GRADE_8
+  GRADE_9
+  GRADE_10
+  GRADE_11
+  GRADE_12
+}
+
+enum AssessmentType {
+  RUBRIC
+  OBSERVATION_CHECKLIST
+  SELF_ASSESSMENT
+  PEER_ASSESSMENT
+  PORTFOLIO
+}
+
+enum ExamType {
+  CAT
+  MIDTERM
+  END_TERM
+  ANNUAL
+}
+
+enum QuestionType {
+  MCQ
+  STRUCTURED
+  ESSAY
+  PRACTICAL
+  TRUE_FALSE
+  FILL_BLANKS
+  MATCHING
+}
+
+// ==================== USER & AUTH ====================
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String?
+  name           String?
+  image          String?
+  role           UserRole  @default(TEACHER)
+  emailVerified  DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  accounts        Account[]
+  sessions        Session[]
+  schoolMembers   SchoolMember[]
+  documents       Document[]
+  chatMessages    ChatMessage[]
+  apiUsage        ApiUsage[]
+  auditLogs       AuditLog[]
+  departmentHead  Department[]     @relation("DepartmentHead")
+  schemes         SchemeOfWork[]
+  generatedLessons GeneratedLesson[]
+  lessonNotes     LessonNote[]
+  worksheets      Worksheet[]
+  assessments     Assessment[]
+  exams           Exam[]
+  markingSchemes  MarkingScheme[]
+
+  // Subscription
+  subscription    Subscription?
+
+  @@index([email])
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==================== SCHOOLS ====================
+
+model School {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logo        String?
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  brandColor  String   @default("#2563eb")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     SchoolMember[]
+  departments Department[]
+  classes     Class[]
+  subjects    Subject[]
+}
+
+model SchoolMember {
+  id       String   @id @default(cuid())
+  schoolId String
+  userId   String
+  role     UserRole @default(TEACHER)
+  joinedAt DateTime @default(now())
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, userId])
+  @@index([schoolId])
+  @@index([userId])
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  schoolId  String
+  name      String
+  headId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school    School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  head      User?        @relation("DepartmentHead", fields: [headId], references: [id])
+  classes   Class[]
+  subjects  Subject[]
+
+  @@unique([schoolId, name])
+  @@index([schoolId])
+}
+
+model Class {
+  id           String   @id @default(cuid())
+  schoolId     String
+  departmentId String?
+  name         String
+  gradeLevel   GradeLevel
+  section      String?
+  roomNumber   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  school     School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  department Department?     @relation(fields: [departmentId], references: [id])
+  studentGroups StudentGroup[]
+
+  @@unique([schoolId, name])
+  @@index([schoolId])
+}
+
+model StudentGroup {
+  id        String   @id @default(cuid())
+  classId   String
+  name      String
+  size      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([classId])
+}
+
+// ==================== CURRICULUM ====================
+
+model Subject {
+  id           String       @id @default(cuid())
+  schoolId     String?
+  departmentId String?
+  name         String
+  code         String?
+  curriculum   CurriculumType @default(CBC)
+  gradeLevel   GradeLevel?
+  description  String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  school     School?        @relation(fields: [schoolId], references: [id])
+  department Department?    @relation(fields: [departmentId], references: [id])
+  strands    Strand[]
+
+  @@index([schoolId])
+  @@index([curriculum, gradeLevel])
+}
+
+model Strand {
+  id          String   @id @default(cuid())
+  subjectId   String
+  name        String
+  code        String?
+  description String?
+  order       Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject    Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subStrands SubStrand[]
+
+  @@index([subjectId])
+}
+
+model SubStrand {
+  id          String   @id @default(cuid())
+  strandId    String
+  name        String
+  code        String?
+  description String?
+  order       Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  strand  Strand   @relation(fields: [strandId], references: [id], onDelete: Cascade)
+  topics  Topic[]
+
+  @@index([strandId])
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  subStrandId String
+  name        String
+  code        String?
+  description String?
+  order       Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subStrand SubStrand @relation(fields: [subStrandId], references: [id], onDelete: Cascade)
+  lessons   GeneratedLesson[]
+
+  @@index([subStrandId])
+}
+
+// ==================== TERMS ====================
+
+model Term {
+  id         String   @id @default(cuid())
+  schoolId   String?
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  isCurrent  Boolean  @default(false)
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  schemes    SchemeOfWork[]
+
+  @@index([schoolId, year])
+}
+
+// ==================== GENERATED DOCUMENTS ====================
+
+model Document {
+  id            String       @id @default(cuid())
+  userId        String
+  title         String
+  type          DocumentType
+  content       Json
+  metadata      Json?
+  subject       String?
+  gradeLevel    GradeLevel?
+  curriculum    CurriculumType @default(CBC)
+  tags          String[]
+  folderId      String?
+  isArchived    Boolean      @default(false)
+  version       Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder        Folder?      @relation(fields: [folderId], references: [id])
+  versions      DocumentVersion[]
+  shares        DocumentShare[]
+
+  @@index([userId])
+  @@index([type])
+  @@index([folderId])
+  @@index([subject, gradeLevel])
+
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  content    Json
+  version    Int
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+model DocumentShare {
+  id         String   @id @default(cuid())
+  documentId String
+  sharedWith String?  // email
+  role       String   @default("VIEWER") // VIEWER, EDITOR
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+model Folder {
+  id        String     @id @default(cuid())
+  userId    String
+  name      String
+  parentId  String?
+  color     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  documents Document[]
+  parent    Folder?    @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children  Folder[]   @relation("FolderHierarchy")
+
+  @@index([userId])
+  @@index([parentId])
+}
+
+// ==================== GENERATED CONTENT ====================
+
+model SchemeOfWork {
+  id            String       @id @default(cuid())
+  userId        String
+  documentId    String?
+  termId        String?
+  subjectId     String?
+  title         String
+  gradeLevel    GradeLevel
+  subject       String
+  curriculum    CurriculumType @default(CBC)
+  content       Json
+  weekCount     Int
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user          User         @relation(fields: [userId], references: [id])
+  term          Term?        @relation(fields: [termId], references: [id])
+  lessons       GeneratedLesson[]
+
+  @@index([userId])
+  @@index([subjectId])
+}
+
+model GeneratedLesson {
+  id             String   @id @default(cuid())
+  schemeOfWorkId String?
+  userId         String
+  documentId     String?
+  topicId        String?
+  title          String
+  gradeLevel     GradeLevel
+  subject        String
+  curriculum     CurriculumType @default(CBC)
+  duration       Int?      // minutes
+  content        Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  schemeOfWork SchemeOfWork? @relation(fields: [schemeOfWorkId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  topic        Topic?        @relation(fields: [topicId], references: [id])
+  lessonNotes  LessonNote[]
+  worksheets   Worksheet[]
+  assessments  Assessment[]
+
+  @@index([userId])
+  @@index([schemeOfWorkId])
+}
+
+model LessonNote {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String?
+  title     String
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User             @relation(fields: [userId], references: [id])
+  lesson GeneratedLesson? @relation(fields: [lessonId], references: [id])
+
+  @@index([userId])
+}
+
+model Worksheet {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String?
+  title     String
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User             @relation(fields: [userId], references: [id])
+  lesson GeneratedLesson? @relation(fields: [lessonId], references: [id])
+
+  @@index([userId])
+}
+
+model Assessment {
+  id             String         @id @default(cuid())
+  userId         String
+  lessonId       String?
+  title          String
+  type           AssessmentType
+  content        Json
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  user           User           @relation(fields: [userId], references: [id])
+  lesson         GeneratedLesson? @relation(fields: [lessonId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+}
+
+model Exam {
+  id            String     @id @default(cuid())
+  userId        String
+  title         String
+  examType      ExamType
+  gradeLevel    GradeLevel
+  subject       String
+  duration      Int?
+  totalMarks    Int?
+  content       Json
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  user          User       @relation(fields: [userId], references: [id])
+  questions     ExamQuestion[]
+  markingScheme MarkingScheme?
+
+  @@index([userId])
+  @@index([examType, gradeLevel])
+}
+
+model ExamQuestion {
+  id          String       @id @default(cuid())
+  examId      String
+  questionNum Int
+  type        QuestionType
+  content     Json
+  marks       Int
+  createdAt   DateTime     @default(now())
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+}
+
+model MarkingScheme {
+  id        String   @id @default(cuid())
+  examId    String   @unique
+  userId    String
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([examId])
+}
+
+// ==================== AI CHAT ====================
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String   // "user" | "assistant" | "system"
+  content   String   @db.Text
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ==================== SUBSCRIPTIONS ====================
+
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String             @unique
+  tier              SubscriptionTier   @default(FREE)
+  status            SubscriptionStatus @default(TRIALING)
+  provider          PaymentProvider?
+  providerId        String?            // Stripe subscription ID, etc.
+  currentPeriodStart DateTime?
+  currentPeriodEnd  DateTime?
+  trialEndsAt       DateTime?
+  cancelledAt       DateTime?
+  schoolId          String?
+  maxTeachers       Int                @default(1)
+  maxStorage        Int                @default(100) // MB
+  features          Json?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices          Invoice[]
+
+  @@index([status, currentPeriodEnd])
+}
+
+model Invoice {
+  id              String          @id @default(cuid())
+  subscriptionId  String
+  amount          Decimal         @db.Decimal(10, 2)
+  currency        String          @default("KES")
+  status          String          // "paid", "pending", "failed"
+  provider        PaymentProvider
+  providerInvoiceId String?
+  paidAt          DateTime?
+  createdAt       DateTime        @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+}
+
+// ==================== USAGE & ANALYTICS ====================
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  tokens    Int?
+  duration  Int?     // ms
+  success   Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action, entity])
+  @@index([createdAt])
+}

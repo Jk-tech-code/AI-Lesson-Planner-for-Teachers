@@ -1,0 +1,110 @@
+export const siteConfig = {
+  name: "AI Lesson Planner",
+  description: "Generate professional CBC teaching documents with AI",
+  url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  ogImage: "/images/og.png",
+  links: {
+    twitter: "https://twitter.com/ailessonplanner",
+    github: "https://github.com/ailessonplanner",
+  },
+}
+
+export const supportedGrades = [
+  { value: "PP1", label: "PP1" },
+  { value: "PP2", label: "PP2" },
+  { value: "GRADE_1", label: "Grade 1" },
+  { value: "GRADE_2", label: "Grade 2" },
+  { value: "GRADE_3", label: "Grade 3" },
+  { value: "GRADE_4", label: "Grade 4" },
+  { value: "GRADE_5", label: "Grade 5" },
+  { value: "GRADE_6", label: "Grade 6" },
+  { value: "GRADE_7", label: "Grade 7" },
+  { value: "GRADE_8", label: "Grade 8" },
+  { value: "GRADE_9", label: "Grade 9" },
+] as const
+
+export const subscriptionPlans = [
+  {
+    name: "Free",
+    tier: "FREE",
+    price: 0,
+    priceYearly: 0,
+    features: [
+      "5 documents per month",
+      "Basic templates",
+      "PDF export",
+      "Community support",
+    ],
+    limits: {
+      documents: 5,
+      storage: 100,
+      exports: "pdf",
+      ai: "basic",
+    },
+  },
+  {
+    name: "Professional",
+    tier: "PROFESSIONAL",
+    price: 15,
+    priceYearly: 150,
+    features: [
+      "Unlimited documents",
+      "All templates",
+      "All export formats",
+      "AI chat assistant",
+      "Priority support",
+      "Version history",
+    ],
+    limits: {
+      documents: -1,
+      storage: 1024,
+      exports: "all",
+      ai: "advanced",
+    },
+  },
+  {
+    name: "School",
+    tier: "SCHOOL",
+    price: 50,
+    priceYearly: 500,
+    features: [
+      "Up to 10 teachers",
+      "All Professional features",
+      "School branding",
+      "Admin dashboard",
+      "Team management",
+      "Shared templates",
+      "API access",
+    ],
+    limits: {
+      documents: -1,
+      storage: 5120,
+      exports: "all",
+      ai: "advanced",
+      teachers: 10,
+    },
+  },
+  {
+    name: "Enterprise",
+    tier: "ENTERPRISE",
+    price: 200,
+    priceYearly: 2000,
+    features: [
+      "Unlimited teachers",
+      "All School features",
+      "Custom integrations",
+      "Dedicated support",
+      "Custom branding",
+      "On-premise option",
+      "SLA guarantee",
+      "Custom AI models",
+    ],
+    limits: {
+      documents: -1,
+      storage: -1,
+      exports: "all",
+      ai: "custom",
+      teachers: -1,
+    },
+  },
+] as const
