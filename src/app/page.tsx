@@ -135,7 +135,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing section */}
       <PricingSection />
 
       <section className="bg-gradient-to-r from-violet-600/90 to-indigo-600/90 text-white py-24">
@@ -153,9 +152,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} AI Lesson Planner. All rights reserved.
+      <footer className="border-t py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 font-bold text-lg mb-4">
+                <Sparkles className="h-5 w-5 text-primary" />
+                AI Lesson Planner
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Generate professional CBC teaching documents with AI.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Product</h3>
+              <ul className="space-y-2">
+                <li><Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</Link></li>
+                <li><Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
+                <li><Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Get Started</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</Link></li>
+                <li><Link href="/refund-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Refund Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} AI Lesson Planner. All rights reserved.
+          </div>
         </div>
       </footer>
     </div>
