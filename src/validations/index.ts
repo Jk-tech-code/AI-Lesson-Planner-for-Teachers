@@ -48,6 +48,16 @@ export const generateExamSchema = z.object({
   duration: z.number().min(15).max(180),
 })
 
+export const generateWorksheetSchema = z.object({
+  gradeLevel: z.string().min(1, "Grade level is required"),
+  subject: z.string().min(1, "Subject is required"),
+  topic: z.string().min(1, "Topic is required"),
+  questionType: z.string().min(1, "Question type is required"),
+  questionCount: z.string().min(1, "Number of questions is required"),
+  difficulty: z.string().min(1, "Difficulty level is required"),
+  includeAnswerKey: z.boolean().default(true),
+})
+
 export const generateAssessmentSchema = z.object({
   gradeLevel: z.string().min(1),
   subject: z.string().min(1),

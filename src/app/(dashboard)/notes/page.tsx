@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "Lesson Notes",
+}
+
 export default function NotesPage() {
   return (
     <div className="space-y-6">

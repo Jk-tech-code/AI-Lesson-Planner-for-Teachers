@@ -46,11 +46,13 @@ export default function DashboardLayout({
         {/* Mobile header with menu toggle */}
         <div className="lg:hidden flex h-14 items-center gap-3 border-b bg-background px-4">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
+          <SheetTrigger
+            render={
               <Button variant="ghost" size="icon" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
-            </SheetTrigger>
+            }
+          />
             <SheetContent side="left" className="p-0 w-64">
               <MobileSidebar onNavClick={() => setMobileMenuOpen(false)} />
             </SheetContent>

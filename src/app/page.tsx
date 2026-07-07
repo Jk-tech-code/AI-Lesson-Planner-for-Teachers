@@ -4,6 +4,19 @@ import { buttonVariants } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { PricingSection } from "@/components/subscription/pricing-section"
+import { siteConfig } from "@/config/site"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "AI Lesson Planner — CBC Teaching Resources Powered by AI",
+  description:
+    "Generate professional CBC lesson plans, schemes of work, exams, and assessments in seconds. AI-powered tool for Kenyan teachers following the Competency-Based Curriculum.",
+  openGraph: {
+    title: "AI Lesson Planner — CBC Teaching Resources Powered by AI",
+    description:
+      "Generate professional CBC lesson plans, schemes of work, exams, and assessments in seconds. Save hours every week with AI-powered lesson planning.",
+  },
+}
 
 const features = [
   {
@@ -45,9 +58,42 @@ const stats = [
   { value: "99.9%", label: "Uptime" },
 ]
 
+function JsonLd() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "AI Lesson Planner",
+    description:
+      "Generate professional CBC teaching documents with AI. Lesson plans, schemes of work, exams, and assessments for Kenyan teachers.",
+    url: siteConfig.url,
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "KES",
+      lowPrice: 0,
+      highPrice: 200,
+      offerCount: 4,
+    },
+    author: {
+      "@type": "Organization",
+      name: "AI Lesson Planner",
+    },
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  )
+}
+
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <>
+      <JsonLd />
+      <div className="min-h-screen">
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2 font-bold text-xl">
@@ -188,5 +234,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

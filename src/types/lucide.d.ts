@@ -1,6 +1,9 @@
+import type { FC, SVGProps } from "react"
+
 declare module "lucide-react" {
-  import { FC, SVGProps } from "react"
+  // Icon components
   export const ArrowRight: FC<SVGProps<SVGSVGElement>>
+  export const ArrowLeft: FC<SVGProps<SVGSVGElement>>
   export const BookOpen: FC<SVGProps<SVGSVGElement>>
   export const Sparkles: FC<SVGProps<SVGSVGElement>>
   export const Layers: FC<SVGProps<SVGSVGElement>>
@@ -40,6 +43,12 @@ declare module "lucide-react" {
   export const Check: FC<SVGProps<SVGSVGElement>>
   export const ChevronDown: FC<SVGProps<SVGSVGElement>>
   export const Menu: FC<SVGProps<SVGSVGElement>>
+  export const Mail: FC<SVGProps<SVGSVGElement>>
+  export const CheckCircle2: FC<SVGProps<SVGSVGElement>>
+  export const Lock: FC<SVGProps<SVGSVGElement>>
+  export const AlertCircle: FC<SVGProps<SVGSVGElement>>
+
+  // Icon-suffixed variants
   export const ChevronDownIcon: FC<SVGProps<SVGSVGElement>>
   export const ChevronUpIcon: FC<SVGProps<SVGSVGElement>>
   export const ChevronRightIcon: FC<SVGProps<SVGSVGElement>>
@@ -53,4 +62,7 @@ declare module "lucide-react" {
   export const TriangleAlertIcon: FC<SVGProps<SVGSVGElement>>
   export const OctagonXIcon: FC<SVGProps<SVGSVGElement>>
   export const Loader2Icon: FC<SVGProps<SVGSVGElement>>
+
+  // Type
+  export type LucideIcon = FC<SVGProps<SVGSVGElement>>
 }

@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { LoginForm } from "@/components/auth/login-form"
 import { Sparkles } from "lucide-react"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to your AI Lesson Planner account to generate CBC teaching documents.",
+}
 
 export default function LoginPage() {
   return (

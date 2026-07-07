@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "Subscription",
+}
+
 export default function SubscriptionPage() {
   return (
     <div className="space-y-6">

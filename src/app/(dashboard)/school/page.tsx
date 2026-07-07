@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "School Settings",
+}
+
 export default function SchoolPage() {
   return (
     <div className="space-y-6">

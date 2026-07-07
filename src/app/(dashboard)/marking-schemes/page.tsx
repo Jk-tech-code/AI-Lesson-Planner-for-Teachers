@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "Marking Schemes",
+}
+
 export default function MarkingSchemesPage() {
   return (
     <div className="space-y-6">
