@@ -164,14 +164,41 @@ If any required information is missing, ask the teacher for:
 * Lesson Duration
 * Strand/Sub-Strand (if known)
 
-Then generate a complete CBC-compliant lesson plan.`
+Then generate a complete CBC-compliant lesson plan.
+
+HUMAN WRITING STYLE
+
+Write like a real teacher talking to another teacher. Not like a textbook or corporate document.
+
+Words to skip:
+- Fancy filler: leverage, optimize, streamline, transformative, holistic, robust, paradigm, ecosystem, landscape, facilitate, empower, delve, harness, unlock, foster, elevate, catalyze, pivotal, nuanced, multifaceted
+- Robot connectors: Moreover, Furthermore, Additionally, Nevertheless, Consequently, Thus
+
+Phrases to skip:
+- "X is not just Y. It's Z."
+- "In today's rapidly evolving..."
+- "At its core..." / "It's important to note..."
+- "Let's dive in" / "Let's explore"
+- "Whether you're X, Y, or Z"
+- "One of the biggest challenges..."
+- "The future of X is Y"
+- "By leveraging X, Y can Z"
+
+What to do:
+- Vary your sentences. Some short. Some long. Some right in the middle.
+- Use concrete classroom examples. "A Grade 4 teacher in Kisumu told me..." not "Teachers find this useful."
+- Include natural teaching language. Phrases like "Most teachers I've worked with...", "Here's the thing...", "What this looks like in practice..."
+- Keep your paragraphs uneven. A long paragraph followed by a short one. Not everything needs the same number of sentences.
+- End sections with something useful, not a recap. A question for reflection. A practical tip. A warning about a common mistake.
+- Show your reasoning. Say why something works, not just that it does.
+- Write the way an experienced mentor teacher would explain things to a new colleague.`
 
 export async function generateContent(options: GenerateOptions) {
   const {
     prompt,
     systemPrompt = DEFAULT_SYSTEM_PROMPT,
     model = "gpt-4o-mini",
-    temperature = 0.7,
+    temperature = 0.85,
     maxTokens = 4000,
     format = "text",
   } = options
@@ -198,7 +225,7 @@ export async function generateStreamingContent(
     prompt,
     systemPrompt = DEFAULT_SYSTEM_PROMPT,
     model = "gpt-4o-mini",
-    temperature = 0.7,
+    temperature = 0.85,
     maxTokens = 4000,
   } = options
 
@@ -261,38 +288,4 @@ export const SCHEME_PROMPT = `Generate a comprehensive CBC scheme of work in JSO
       "week": 1,
       "strand": "Strand name",
       "subStrand": "Sub-strand name",
-      "learningOutcomes": ["Learning outcomes"],
-      "learningExperiences": ["Learning experiences"],
-      "resources": ["Resources needed"],
-      "assessment": ["Assessment methods"],
-      "reflection": "Reflection notes"
-    }
-  ]
-}`
-
-export const EXAM_PROMPT = `Generate a professional CBC exam in JSON format with the following structure:
-{
-  "title": "Exam title",
-  "gradeLevel": "Grade level",
-  "subject": "Subject",
-  "examType": "CAT | MIDTERM | END_TERM | ANNUAL",
-  "duration": "Duration in minutes",
-  "totalMarks": "Total marks",
-  "instructions": "General instructions",
-  "sections": [
-    {
-      "name": "Section A",
-      "instructions": "Section instructions",
-      "totalMarks": "Section marks",
-      "questions": [
-        {
-          "number": 1,
-          "type": "MCQ | STRUCTURED | ESSAY | PRACTICAL",
-          "question": "Question text",
-          "marks": 2,
-          "options": ["Option A", "Option B", "Option C", "Option D"]
-        }
-      ]
-    }
-  ]
-}`
+      "le
