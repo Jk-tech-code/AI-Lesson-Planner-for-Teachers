@@ -288,11 +288,15 @@ export const SCHEME_PROMPT = `Generate a comprehensive CBC scheme of work in JSO
       "week": 1,
       "strand": "Strand name",
       "subStrand": "Sub-strand name",
-      "learningOutcomes": ["Learning outcomes for the week"],
-      "learningExperiences": ["Learning activities and experiences"],
-      "resources": ["Required teaching resources"],
-      "assessment": ["Assessment methods"],
-      "reflection": "Teacher reflection notes"
+      "lessonTitle": "Lesson title",
+      "learningOutcomes": ["Learning outcomes"],
+      "keyInquiryQuestions": ["Key inquiry questions"],
+      "coreCompetencies": ["Core competencies"],
+      "values": ["Values"],
+      "learningResources": ["Learning resources"],
+      "learningActivities": ["Learning activities"],
+      "assessmentMethods": ["Assessment methods"],
+      "reflection": "Reflection notes"
     }
   ]
 }`
@@ -302,22 +306,23 @@ export const EXAM_PROMPT = `Generate a comprehensive CBC exam in JSON format wit
   "title": "Exam title",
   "gradeLevel": "Grade level",
   "subject": "Subject name",
-  "examType": "CAT, MIDTERM, END_TERM, or ANNUAL",
-  "totalMarks": 50,
-  "duration": 60,
-  "instructions": "General exam instructions",
+  "examType": "CAT | MIDTERM | END_TERM | ANNUAL",
+  "totalMarks": 100,
+  "duration": "Duration in minutes",
+  "instructions": "General instructions for students",
   "sections": [
     {
-      "name": "Section A",
-      "instructions": "Section instructions",
-      "totalMarks": 20,
+      "sectionName": "Section A: Objective Questions",
+      "instructions": "Answer all questions in this section",
+      "totalMarks": 30,
       "questions": [
         {
-          "number": 1,
-          "type": "MCQ",
+          "questionNumber": 1,
+          "questionType": "MCQ | STRUCTURED | ESSAY | TRUE_FALSE | FILL_BLANKS | MATCHING",
           "question": "Question text",
-          "marks": 2,
-          "options": ["Option A", "Option B", "Option C", "Option D"]
+          "marks": 1,
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "answer": "Correct answer"
         }
       ]
     }
