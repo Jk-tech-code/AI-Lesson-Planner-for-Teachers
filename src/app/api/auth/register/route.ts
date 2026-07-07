@@ -1,26 +1,39 @@
-import { NextRequest } from "next/server"
-import bcrypt from "bcryptjs"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { successResponse, errorResponse } from "@/lib/api-utils"
 import { registerSchema } from "@/validations"
+import bcrypt from "bcryptjs"
+import { sendWelcomeEmail } from "@/lib/email"
 
-export async function POST(request: NextRequest) {
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+}
+
+export async function POST(req: Request) {
   try {
-    const body = await request.json()
-    const parsed = registerSchema.safeParse(body)
+    const body = await req.json()
+    const validation = registerSchema.safeParse(body)
 
-    if (!parsed.success) {
-      return errorResponse(parsed.error.issues[0].message, 400)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: validation.error.flatten().fieldErrors },
+        { status: 400 }
+      )
     }
 
-    const { name, email, password, schoolName, role } = parsed.data
+    const { name, email, password, schoolName, role } = validation.data
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
 
     if (existingUser) {
-      return errorResponse("Email already registered", 409)
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 409 }
+      )
     }
 
     const passwordHash = await bcrypt.hash(password, 12)
@@ -30,7 +43,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         passwordHash,
-        role,
+        role: role || "TEACHER",
       },
       select: {
         id: true,
@@ -40,42 +53,45 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Create school if school name provided
-    if (schoolName && role === "SCHOOL_ADMIN") {
-      const schoolSlug = schoolName
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_-]+/g, "-")
+    // Create subscription
+    await prisma.subscription.create({
+      data: {
+        userId: user.id,
+        tier: "FREE",
+        status: "TRIAL",
+        currentPeriodEnd: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      },
+    })
 
+    // Handle school setup
+    if (schoolName && role === "SCHOOL_ADMIN") {
       const school = await prisma.school.create({
         data: {
           name: schoolName,
-          slug: schoolSlug,
+          slug: slugify(schoolName),
         },
       })
 
       await prisma.schoolMember.create({
         data: {
-          schoolId: school.id,
           userId: user.id,
+          schoolId: school.id,
           role: "SCHOOL_ADMIN",
         },
       })
     }
 
-    // Create free subscription
-    await prisma.subscription.create({
-      data: {
-        userId: user.id,
-        tier: "FREE",
-        status: "TRIALING",
-        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      },
-    })
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail({ name, email }).catch((err) =>
+      console.error("Welcome email failed:", err)
+    )
 
-    return successResponse(user, 201)
+    return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
     console.error("Registration error:", error)
-    return errorResponse("Internal server error", 500)
+    return NextResponse.json(
+      { error: "Something went wrong. Please try again." },
+      { status: 500 }
+    )
   }
 }
