@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Sparkles, Layers, Download, MessageSquare, Gradua
 import { buttonVariants } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { PricingSection } from "@/components/subscription/pricing-section"
 
 const features = [
   {
@@ -101,7 +102,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y py-12">
+      <section className="border-y py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -123,7 +124,7 @@ export default function HomePage() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
-            <Card key={feature.title} className="border-2">
+            <Card key={feature.title} className="border-2 hover:border-primary/50 transition-colors">
               <CardHeader>
                 <feature.icon className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>{feature.title}</CardTitle>
@@ -133,6 +134,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Pricing section */}
+      <PricingSection />
 
       <section className="bg-gradient-to-r from-violet-600/90 to-indigo-600/90 text-white py-24">
         <div className="container mx-auto px-4 text-center">

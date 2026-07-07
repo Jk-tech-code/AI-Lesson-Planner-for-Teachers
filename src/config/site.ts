@@ -1,3 +1,23 @@
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  BookOpen,
+  FileText,
+  FileSpreadsheet,
+  Pencil,
+  ClipboardCheck,
+  GraduationCap,
+  CheckSquare,
+  FolderOpen,
+  MessageSquare,
+  Building2,
+  Users,
+  CreditCard,
+  BarChart3,
+  Settings,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
 export const siteConfig = {
   name: "AI Lesson Planner",
   description: "Generate professional CBC teaching documents with AI",
@@ -10,63 +30,79 @@ export const siteConfig = {
 }
 
 export const supportedGrades = [
-  { value: "PP1", label: "PP1" },
-  { value: "PP2", label: "PP2" },
-  { value: "GRADE_1", label: "Grade 1" },
-  { value: "GRADE_2", label: "Grade 2" },
-  { value: "GRADE_3", label: "Grade 3" },
-  { value: "GRADE_4", label: "Grade 4" },
-  { value: "GRADE_5", label: "Grade 5" },
-  { value: "GRADE_6", label: "Grade 6" },
-  { value: "GRADE_7", label: "Grade 7" },
-  { value: "GRADE_8", label: "Grade 8" },
-  { value: "GRADE_9", label: "Grade 9" },
+  "PP1",
+  "PP2",
+  "Grade 1",
+  "Grade 2",
+  "Grade 3",
+  "Grade 4",
+  "Grade 5",
+  "Grade 6",
+  "Grade 7",
+  "Grade 8",
+  "Grade 9",
+  "Grade 10",
+  "Grade 11",
+  "Grade 12",
 ] as const
 
-export const subscriptionPlans = [
+export type SubscriptionTier = "FREE" | "PROFESSIONAL" | "SCHOOL" | "ENTERPRISE"
+
+export interface SubscriptionPlan {
+  id: SubscriptionTier
+  name: string
+  description: string
+  monthlyPrice: number
+  yearlyPrice: number
+  stripeMonthlyPriceId?: string
+  stripeYearlyPriceId?: string
+  features: string[]
+  highlighted?: boolean
+  popular?: boolean
+}
+
+export const subscriptionPlans: SubscriptionPlan[] = [
   {
+    id: "FREE",
     name: "Free",
-    tier: "FREE",
-    price: 0,
-    priceYearly: 0,
+    description: "Get started with basic lesson planning tools.",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    stripeMonthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_FREE_PRICE_ID,
+    stripeYearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_FREE_YEARLY_PRICE_ID,
     features: [
       "5 documents per month",
       "Basic templates",
       "PDF export",
       "Community support",
     ],
-    limits: {
-      documents: 5,
-      storage: 100,
-      exports: "pdf",
-      ai: "basic",
-    },
   },
   {
+    id: "PROFESSIONAL",
     name: "Professional",
-    tier: "PROFESSIONAL",
-    price: 15,
-    priceYearly: 150,
+    description: "Perfect for individual teachers who need more.",
+    monthlyPrice: 15,
+    yearlyPrice: 150,
+    stripeMonthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID,
+    stripeYearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_YEARLY_PRICE_ID,
     features: [
       "Unlimited documents",
       "All templates",
-      "All export formats",
+      "All export formats (PDF, Word, PPT, Excel)",
       "AI chat assistant",
       "Priority support",
       "Version history",
     ],
-    limits: {
-      documents: -1,
-      storage: 1024,
-      exports: "all",
-      ai: "advanced",
-    },
+    popular: true,
   },
   {
+    id: "SCHOOL",
     name: "School",
-    tier: "SCHOOL",
-    price: 50,
-    priceYearly: 500,
+    description: "For schools and departments.",
+    monthlyPrice: 50,
+    yearlyPrice: 500,
+    stripeMonthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SCHOOL_PRICE_ID,
+    stripeYearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SCHOOL_YEARLY_PRICE_ID,
     features: [
       "Up to 10 teachers",
       "All Professional features",
@@ -76,19 +112,15 @@ export const subscriptionPlans = [
       "Shared templates",
       "API access",
     ],
-    limits: {
-      documents: -1,
-      storage: 5120,
-      exports: "all",
-      ai: "advanced",
-      teachers: 10,
-    },
   },
   {
+    id: "ENTERPRISE",
     name: "Enterprise",
-    tier: "ENTERPRISE",
-    price: 200,
-    priceYearly: 2000,
+    description: "For large institutions and organizations.",
+    monthlyPrice: 200,
+    yearlyPrice: 2000,
+    stripeMonthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID,
+    stripeYearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_YEARLY_PRICE_ID,
     features: [
       "Unlimited teachers",
       "All School features",
@@ -99,12 +131,6 @@ export const subscriptionPlans = [
       "SLA guarantee",
       "Custom AI models",
     ],
-    limits: {
-      documents: -1,
-      storage: -1,
-      exports: "all",
-      ai: "custom",
-      teachers: -1,
-    },
+    highlighted: true,
   },
-] as const
+]
