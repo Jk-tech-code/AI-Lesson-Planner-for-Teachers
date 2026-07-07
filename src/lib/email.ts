@@ -2,7 +2,7 @@ import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM_EMAIL = "AI Lesson Planner <noreply@ailessonplanner.com>"
+const FROM_EMAIL = "AI Lesson Planner <onboarding@resend.dev>"
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
 export async function sendWelcomeEmail({
